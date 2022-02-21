@@ -59,6 +59,31 @@ Because in terraform we specfic ip comming from instance created
       command = "ansible-playbook --inventory ${self.public_ip}, --private-key ${var.ssh_private_key} --user ec2-user deploy-docker.yaml"
 }
 
+#### Use aws_ec2 plugin  to get infrastructure info
+
+```bash
+ $ ansible-inventory -i inventory_aws_ec2.yaml --list
+ or 
+ $ ansible-inventory -i inventory_aws_ec2.yaml --grap # return list of ec2 instances running
+ @all:
+  |--@aws_ec2:
+  |  |--ec2-18-116-28-84.us-east-2.compute.amazonaws.com
+  |  |--ec2-18-117-93-152.us-east-2.compute.amazonaws.com
+  |  |--ec2-3-17-110-123.us-east-2.compute.amazonaws.com
+  |--@ungrouped:
+```
+Use now aws_ec2 like hosts in your ansible configuration
+
+#### Launch ansible-playbook with dynamic inventory 
+
+```bash
+    $ ansible-playbook -i inventory_aws_ec2.yaml deploy-docker.yaml
+    or 
+    $ ansible-playbook deploy-docker.yaml # if set inventory with inventory_aws_ec2.yaml in the ansible.cfg
+```
+
+
+
 
 
 
