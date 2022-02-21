@@ -1,0 +1,5 @@
+location: where is your application javascript  
+version: 1.0.0 
+linux_user_name: node
+user_home_dir: /home/{{linux_user_name}}
+docker_password: xxxxxx

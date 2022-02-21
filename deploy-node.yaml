@@ -1,0 +1,79 @@
+---
+- name: Install node and npm
+  hosts: webserver
+
+  tasks:
+    - name: Update apt repo and cache
+      apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+
+    - name: Install node and npm
+      apt: 
+        pkg:
+          - nodejs
+          - npm  
+
+
+- name: Create new linux user for node app   
+  hosts: webserver
+  vars_files:
+    - vars
+
+  tasks:
+    - name: Create linux user
+      user: 
+        name: "{{linux_user_name}}"     
+        comment: "{{linux_user_name}} user" 
+        group: admin
+
+
+- name: Deploy nodejs app
+  hosts: webserver
+  become: yes
+  become_user: "{{linux_user_name}}"
+
+  vars_files:
+    - vars
+
+  tasks:
+    - name: Unpack the nodejs app file
+      unarchive: 
+        src: "{{location}}/developing-with-docker-{{version}}.tgz" # take a locale tar file and unpack it in the server
+        dest: "{{user_home_dir}}"
+
+    - name : Install dependencies 
+      npm:
+        path: "{{user_home_dir}}/package"
+
+    - name: Add MONGO_DB_USERNAME environment variable to the remote user's shell used in all tasks
+      lineinfile:
+        dest: "~/.profile"
+        regexp: '^MONGO_DB_USERNAME= '
+        line: 'MONGO_DB_USERNAME=admin'
+      become: no  
+
+    - name: Add MONGO_DB_PWD environment variable to the remote user's shell used in all tasks
+      lineinfile:
+        dest: "~/.profile"
+        regexp: '^MONGO_DB_PWD= '
+        line: 'MONGO_DB_PWD=password'
+      become: no           
+
+    - name: Start application 
+      command: 
+        chdir: "{{user_home_dir}}/package/app"
+        cmd: node server
+      async: 1000
+      poll: 0  
+
+    - name: Ensure app is running
+      shell: ps -aux | grep node
+      register: app_status
+
+    - name:  Display app status
+      debug: msg={{app_status.stdout_lines}} 
+      
+  
+            
+
+
+    
