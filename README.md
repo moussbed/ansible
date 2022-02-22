@@ -61,6 +61,11 @@ Because in terraform we specfic ip comming from instance created
 
 #### Use aws_ec2 plugin  to get infrastructure info
 
+##### Requirements
+
+- boto3
+- botocore  
+
 ```bash
  $ ansible-inventory -i inventory_aws_ec2.yaml --list
  or 
@@ -81,6 +86,27 @@ Use now aws_ec2 like hosts in your ansible configuration
     or 
     $ ansible-playbook deploy-docker.yaml # if set inventory with inventory_aws_ec2.yaml in the ansible.cfg
 ```
+
+#### k8s 
+
+##### Requirements
+The below requirements are needed on the host that executes this module.
+
+- python >= 3.6
+- kubernetes >= 12.0.0
+- PyYAML >= 3.11
+- jsonpatch
+
+ 
+##### kubeconfig paramater:
+Path to an existing Kubernetes config file. If not provided, and no other connection options are provided, the Kubernetes client will attempt to load the default configuration file from ~/.kube/config. Can also be specified via K8S_AUTH_KUBECONFIG environment variable.
+The kubernetes configuration can be provided as dictionary. This feature requires a python kubernetes client version >= 17.17.0. Added in version 2.2.0.
+Before that we have to connect to our cluster with kubectl with this command:
+
+```bash
+   $ aws eks update-kubeconfig --name myapp-eks-cluster --region us-east-2
+```
+
 
 
 
